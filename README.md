@@ -172,11 +172,11 @@ VITE_API_BASE_URL=https://your-backend-url.onrender.com/api
 
 ## Frontend Deployment
 Deployed using Render:
-https://your-frontend-url.onrender.com
+https://reel-saas-frontend.onrender.com
 
 ## Backend Deployment
 Deployed using Render:
-https://your-backend-url.onrender.com
+https://reel-saas-backend.onrender.com
 
 ---
 
