@@ -1,13 +1,28 @@
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://reel-saas-backend.onrender.com/api";
 
+const clearAuth = () => {
+  localStorage.removeItem('token');
+  if (typeof window !== 'undefined' && window.location.pathname !== '/login') {
+    window.location.href = '/login';
+  }
+};
+
 const parseResponse = async (res) => {
   const data = await res.json();
   if (!res.ok) {
+    if (res.status === 401) {
+      clearAuth();
+    }
     const rawMessage = data?.message || data?.errors?.map((err) => err.msg).join(', ') || 'Request failed';
     const message = typeof rawMessage === 'string' ? rawMessage : JSON.stringify(rawMessage);
     throw new Error(message);
   }
   return data;
+};
+
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
 // 🔐 AUTH API
@@ -37,10 +52,9 @@ export const authAPI = {
   },
 
   getUser: async () => {
-    const token = localStorage.getItem('token');
     const res = await fetch(`${BASE_URL}/auth/user`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        ...getAuthHeaders(),
       },
     });
     return parseResponse(res);
@@ -63,10 +77,9 @@ export const authAPI = {
 // IDEAS API
 export const ideasAPI = {
   getIdeas: async () => {
-    const token = localStorage.getItem('token');
     const res = await fetch(`${BASE_URL}/ideas`, {
       headers: {
-        Authorization: `Bearer ${token}`,
+        ...getAuthHeaders(),
       },
     });
     const data = await parseResponse(res);
@@ -74,12 +87,11 @@ export const ideasAPI = {
   },
 
   generateIdea: async (payload) => {
-    const token = localStorage.getItem('token');
     const res = await fetch(`${BASE_URL}/ideas/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
+        ...getAuthHeaders(),
       },
       body: JSON.stringify(payload),
     });
@@ -88,11 +100,10 @@ export const ideasAPI = {
   },
 
   deleteIdea: async (id) => {
-    const token = localStorage.getItem('token');
     const res = await fetch(`${BASE_URL}/ideas/${id}`, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${token}`,
+        ...getAuthHeaders(),
       },
     });
     return parseResponse(res);
