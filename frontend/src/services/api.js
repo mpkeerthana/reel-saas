@@ -1,4 +1,4 @@
-const BASE_URL = "http://localhost:5000/api";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "https://reel-saas-backend.onrender.com/api";
 
 const parseResponse = async (res) => {
   const data = await res.json();
